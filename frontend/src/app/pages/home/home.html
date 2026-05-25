@@ -1,0 +1,120 @@
+<div class="container py-5 fade-in-section">
+  <!-- Hero Section -->
+  <div class="row align-items-center mb-5 py-4">
+    <div class="col-lg-7 mb-4 mb-lg-0 text-center text-lg-start">
+      <h1 class="display-3 mb-3 text-white fw-extrabold">
+        Savor the Moments,<br>
+        <span class="gold-text-gradient">Reserve the Experience</span>
+      </h1>
+      <p class="fs-5 text-secondary mb-4 col-lg-10">
+        Welcome to DineEase, the hotel's premium dining reservation engine. View real-time table availability and secure your dining reservation instantly.
+      </p>
+      
+      <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3">
+        <a routerLink="/book" class="btn btn-gold px-4 py-3 fs-5">
+          <i class="bi bi-calendar-check me-2"></i> Book A Table Now
+        </a>
+        @if (!api.isLoggedIn()) {
+          <a routerLink="/login" class="btn btn-outline-gold px-4 py-3 fs-5">
+            Customer Login <i class="bi bi-arrow-right ms-2"></i>
+          </a>
+        } @else if (api.isAdmin()) {
+          <a routerLink="/admin" class="btn btn-outline-gold px-4 py-3 fs-5">
+            Admin Dashboard <i class="bi bi-speedometer2 ms-2"></i>
+          </a>
+        } @else {
+          <a routerLink="/my-bookings" class="btn btn-outline-gold px-4 py-3 fs-5">
+            My Bookings <i class="bi bi-person ms-2"></i>
+          </a>
+        }
+      </div>
+    </div>
+    
+    <div class="col-lg-5">
+      <div class="glass-card text-center p-4 border-gold">
+        <div class="p-2 bg-dark rounded-circle d-inline-flex mb-3" style="width: 80px; height: 80px; align-items: center; justify-content: center; background: rgba(255,255,255,0.05) !important;">
+          <i class="bi bi-clock-history text-warning fs-1"></i>
+        </div>
+        <h3 class="text-white mb-2">No More Waiting</h3>
+        <p class="text-secondary mb-4">
+          Reserve your spot in advance and bypass the waiting queue. Enjoy personalized seating in our premium dining areas.
+        </p>
+        <div class="d-flex justify-content-around text-center pt-2 border-top border-secondary">
+          <div>
+            <h4 class="text-warning mb-0">100%</h4>
+            <small class="text-muted">Instant Booking</small>
+          </div>
+          <div>
+            <h4 class="text-warning mb-0">10</h4>
+            <small class="text-muted">Dining Tables</small>
+          </div>
+          <div>
+            <h4 class="text-warning mb-0">24/7</h4>
+            <small class="text-muted">Online Portal</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Highlights -->
+  <h2 class="text-center text-white mb-5 display-5 fw-bold">Our <span class="text-warning">Highlights</span></h2>
+  
+  <div class="row g-4">
+    <!-- Highlight 1 -->
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card h-100 p-0 overflow-hidden">
+        <div style="height: 180px; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-egg-fried text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <div class="p-4">
+          <h4 class="text-white">Gastronomic Art</h4>
+          <p class="text-secondary small">Chef's signature menu items prepared using handpicked, seasonal local ingredients.</p>
+          <span class="badge bg-secondary">Fine Dining</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlight 2 -->
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card h-100 p-0 overflow-hidden">
+        <div style="height: 180px; background: linear-gradient(135deg, #0d9488 0%, #115e59 100%); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-music-note-beamed text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <div class="p-4">
+          <h4 class="text-white">Luxury Ambiance</h4>
+          <p class="text-secondary small">Soothing background melodies, warm candle lighting, and spacious seating designs.</p>
+          <span class="badge bg-secondary">Comfortable</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlight 3 -->
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card h-100 p-0 overflow-hidden">
+        <div style="height: 180px; background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-award text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <div class="p-4">
+          <h4 class="text-white">Impeccable Service</h4>
+          <p class="text-secondary small">Attentive staff and custom arrangements committed to creating memorable moments.</p>
+          <span class="badge bg-secondary">Premium Care</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlight 4 -->
+    <div class="col-md-6 col-lg-3">
+      <div class="glass-card h-100 p-0 overflow-hidden">
+        <div style="height: 180px; background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%); display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-calendar-event text-warning" style="font-size: 4rem;"></i>
+        </div>
+        <div class="p-4">
+          <h4 class="text-white">Simple Booking</h4>
+          <p class="text-secondary small">Fast online scheduling portal allowing hassle-free table reservations in seconds.</p>
+          <span class="badge bg-secondary">Instant Access</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

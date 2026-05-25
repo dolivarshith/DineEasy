@@ -1,0 +1,70 @@
+<!-- Navigation Header -->
+<nav class="navbar navbar-expand-lg navbar-dark glass-navbar sticky-top">
+  <div class="container">
+    <a class="navbar-brand text-warning" routerLink="/">
+      <i class="bi bi-clock-history me-2"></i>Dine<span class="text-white">Ease</span>
+    </a>
+    <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link text-light px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light px-3" routerLink="/book" routerLinkActive="active">Book a Table</a>
+        </li>
+        @if (api.isLoggedIn()) {
+          @if (!api.isAdmin()) {
+            <li class="nav-item">
+              <a class="nav-link text-light px-3" routerLink="/my-bookings" routerLinkActive="active">My Reservations</a>
+            </li>
+          } @else {
+            <li class="nav-item">
+              <a class="nav-link text-light px-3" routerLink="/admin" routerLinkActive="active">Admin Console</a>
+            </li>
+          }
+        }
+      </ul>
+      
+      <div class="d-flex align-items-center gap-3">
+        @if (api.isLoggedIn()) {
+          <div class="d-inline-flex align-items-center">
+            <span class="text-secondary small me-2">Hello,</span>
+            <span class="text-warning fw-semibold"><i class="bi bi-person-circle me-1"></i>{{ api.currentUser()?.username }}</span>
+            @if (api.isAdmin()) {
+              <span class="badge bg-danger ms-1" style="font-size: 0.65rem;">Admin</span>
+            }
+          </div>
+          <button (click)="onLogout()" class="btn btn-sm btn-outline-gold px-3 rounded-pill">
+            <i class="bi bi-box-arrow-right me-1"></i> Logout
+          </button>
+        } @else {
+          <a routerLink="/login" class="btn btn-sm btn-outline-gold px-3 rounded-pill">Sign In</a>
+          <a routerLink="/register" class="btn btn-sm btn-gold px-3 rounded-pill text-dark">Register</a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Page Router Outlet -->
+<main class="py-3">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Footer -->
+<footer class="py-5 mt-auto border-top border-secondary border-opacity-15 text-center text-secondary small bg-dark bg-opacity-30">
+  <div class="container">
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-6">
+        <h4 class="text-white mb-2"><i class="bi bi-clock-history me-2 text-warning"></i>DineEase</h4>
+        <p class="text-muted">A premium Hotel Table Reservation System. Experience luxury ambiance, real-time availability checks, and streamlined online bookings.</p>
+      </div>
+    </div>
+    <div class="border-top border-secondary border-opacity-10 pt-4">
+      <p class="mb-0">&copy; 2026 DineEase System. All rights reserved. Built with Angular & Spring Boot.</p>
+    </div>
+  </div>
+</footer>

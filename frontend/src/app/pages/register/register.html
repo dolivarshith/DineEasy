@@ -1,0 +1,114 @@
+<div class="container py-5 fade-in-section">
+  <div class="row justify-content-center py-4">
+    <div class="col-md-6 col-lg-5">
+      <div class="glass-card p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="bg-dark rounded-circle d-inline-flex mb-3" style="width: 60px; height: 60px; align-items: center; justify-content: center; background: rgba(255,255,255,0.05) !important;">
+            <i class="bi bi-person-plus-fill text-warning fs-2"></i>
+          </div>
+          <h2 class="text-white mb-1">Create Account</h2>
+          <p class="text-secondary small">Join DineEase to reserve and manage table bookings</p>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+          </div>
+        }
+
+        @if (successMessage()) {
+          <div class="alert alert-success border-0 bg-success bg-opacity-10 text-success rounded-3" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage() }}
+          </div>
+        }
+
+        <form (ngSubmit)="onSubmit()">
+          <!-- Username -->
+          <div class="mb-3">
+            <label for="username" class="form-label text-secondary small">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-end-0 text-secondary">
+                <i class="bi bi-person"></i>
+              </span>
+              <input type="text" 
+                     id="username" 
+                     name="username" 
+                     class="form-control border-start-0" 
+                     placeholder="Enter username" 
+                     [(ngModel)]="username" 
+                     required>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label for="email" class="form-label text-secondary small">Email Address</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-end-0 text-secondary">
+                <i class="bi bi-envelope"></i>
+              </span>
+              <input type="email" 
+                     id="email" 
+                     name="email" 
+                     class="form-control border-start-0" 
+                     placeholder="Enter email address" 
+                     [(ngModel)]="email" 
+                     required>
+            </div>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <label for="password" class="form-label text-secondary small">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-end-0 text-secondary">
+                <i class="bi bi-key"></i>
+              </span>
+              <input type="password" 
+                     id="password" 
+                     name="password" 
+                     class="form-control border-start-0" 
+                     placeholder="Create password" 
+                     [(ngModel)]="password" 
+                     required>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-4">
+            <label for="confirmPassword" class="form-label text-secondary small">Confirm Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-transparent border-secondary border-end-0 text-secondary">
+                <i class="bi bi-key-fill"></i>
+              </span>
+              <input type="password" 
+                     id="confirmPassword" 
+                     name="confirmPassword" 
+                     class="form-control border-start-0" 
+                     placeholder="Confirm password" 
+                     [(ngModel)]="confirmPassword" 
+                     required>
+            </div>
+          </div>
+
+          <!-- Sign Up Button -->
+          <button type="submit" class="btn btn-gold w-100 py-2 fs-5 mb-3" [disabled]="isLoading() || successMessage() !== null">
+            @if (isLoading()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+              Creating Account...
+            } @else {
+              Register
+            }
+          </button>
+        </form>
+
+        <div class="text-center pt-2">
+          <p class="text-secondary small mb-0">
+            Already have an account? 
+            <a routerLink="/login" class="text-warning text-decoration-none">Sign In</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

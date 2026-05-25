@@ -1,0 +1,278 @@
+<div class="container py-5 fade-in-section">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+    <div>
+      <h1 class="display-4 text-white fw-bold">Admin <span class="gold-text-gradient">Console</span></h1>
+      <p class="text-secondary mb-0">Monitor online table reservations and manage physical restaurant configurations.</p>
+    </div>
+    <button (click)="loadAllData()" class="btn btn-outline-gold"><i class="bi bi-arrow-clockwise me-1"></i> Sync Data</button>
+  </div>
+
+  <!-- Messages -->
+  @if (successMessage()) {
+    <div class="alert alert-success border-0 bg-success bg-opacity-10 text-success rounded-3 mb-4 fade-in-section" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i> {{ successMessage() }}
+    </div>
+  }
+  @if (errorMessage()) {
+    <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-3 mb-4" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ errorMessage() }}
+    </div>
+  }
+
+  <!-- Stats Analytics Grid -->
+  <div class="row g-4 mb-5">
+    <!-- Stat 1 -->
+    <div class="col-6 col-lg-3">
+      <div class="glass-card text-center p-3" style="background: linear-gradient(135deg, rgba(12,74,110,0.4) 0%, rgba(18,20,32,0.7) 100%) !important;">
+        <i class="bi bi-hash fs-2 text-info mb-2 d-inline-block"></i>
+        <h2 class="text-white mb-0 fw-bold">{{ stats().totalTables }}</h2>
+        <span class="text-secondary small">Total Tables</span>
+      </div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="col-6 col-lg-3">
+      <div class="glass-card text-center p-3" style="background: linear-gradient(135deg, rgba(6,95,70,0.4) 0%, rgba(18,20,32,0.7) 100%) !important;">
+        <i class="bi bi-calendar-check-fill fs-2 text-success mb-2 d-inline-block"></i>
+        <h2 class="text-white mb-0 fw-bold">{{ stats().activeReservationsToday }}</h2>
+        <span class="text-secondary small">Active Today</span>
+      </div>
+    </div>
+    <!-- Stat 3 -->
+    <div class="col-6 col-lg-3">
+      <div class="glass-card text-center p-3" style="background: linear-gradient(135deg, rgba(180,83,9,0.4) 0%, rgba(18,20,32,0.7) 100%) !important;">
+        <i class="bi bi-hourglass-split fs-2 text-warning mb-2 d-inline-block"></i>
+        <h2 class="text-white mb-0 fw-bold">{{ stats().pendingReservationsCount }}</h2>
+        <span class="text-secondary small">Pending Approval</span>
+      </div>
+    </div>
+    <!-- Stat 4 -->
+    <div class="col-6 col-lg-3">
+      <div class="glass-card text-center p-3" style="background: linear-gradient(135deg, rgba(109,40,217,0.4) 0%, rgba(18,20,32,0.7) 100%) !important;">
+        <i class="bi bi-journal-text fs-2 text-primary mb-2 d-inline-block"></i>
+        <h2 class="text-white mb-0 fw-bold">{{ stats().totalReservations }}</h2>
+        <span class="text-secondary small">Total Bookings</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Buttons -->
+  <div class="d-flex mb-4 border-bottom border-secondary pb-2">
+    <button (click)="activeTab = 'reservations'" 
+            class="btn px-4 py-2 me-2 border-0 fw-bold" 
+            [class.btn-warning]="activeTab === 'reservations'" 
+            [class.text-white]="activeTab !== 'reservations'">
+      <i class="bi bi-card-list me-2"></i>Reservations Manager
+    </button>
+    <button (click)="activeTab = 'tables'" 
+            class="btn px-4 py-2 border-0 fw-bold" 
+            [class.btn-warning]="activeTab === 'tables'" 
+            [class.text-white]="activeTab !== 'tables'">
+      <i class="bi bi-grid-fill me-2"></i>Dining Tables Inventory
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-warning" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  } @else {
+    <!-- TAB 1: RESERVATIONS MANAGER -->
+    @if (activeTab === 'reservations') {
+      @if (reservations().length === 0) {
+        <div class="glass-card py-5 text-center text-secondary">
+          <i class="bi bi-calendar-x fs-1 mb-3 d-block text-muted"></i>
+          <h4>No reservations found in the system.</h4>
+        </div>
+      } @else {
+        <div class="glass-card p-0 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+              <thead style="background: rgba(255,255,255,0.01)">
+                <tr class="text-secondary small">
+                  <th class="ps-4 py-3">ID</th>
+                  <th class="py-3">Customer</th>
+                  <th class="py-3">Contact</th>
+                  <th class="py-3">Date / Time</th>
+                  <th class="py-3">Table Info</th>
+                  <th class="py-3">Guests</th>
+                  <th class="py-3">Requests</th>
+                  <th class="py-3">Status</th>
+                  <th class="py-3 pe-4 text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (res of reservations(); track res.id) {
+                  <tr style="border-color: var(--border-light)">
+                    <td class="ps-4 fw-bold">#DE-{{ res.id }}</td>
+                    <td class="text-white fw-semibold">{{ res.customerName }}</td>
+                    <td class="small">
+                      <div class="text-white">{{ res.customerEmail }}</div>
+                      <div class="text-muted">{{ res.customerPhone }}</div>
+                    </td>
+                    <td>
+                      <div>{{ res.reservationDate }}</div>
+                      <div class="text-warning small"><i class="bi bi-clock me-1"></i>{{ res.reservationTime.substring(0, 5) }}</div>
+                    </td>
+                    <td>
+                      <span class="badge bg-dark border border-secondary text-white">Table {{ res.diningTable.tableNumber }}</span>
+                    </td>
+                    <td class="fw-bold text-warning">{{ res.numberOfGuests }}</td>
+                    <td class="small text-secondary" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" [title]="res.specialRequests || ''">
+                      {{ res.specialRequests || '—' }}
+                    </td>
+                    <td>
+                      @if (res.status === 'PENDING') {
+                        <span class="badge-pending">Pending</span>
+                      } @else if (res.status === 'CONFIRMED') {
+                        <span class="badge-confirmed">Approved</span>
+                      } @else {
+                        <span class="badge-cancelled">Cancelled</span>
+                      }
+                    </td>
+                    <td class="pe-4 text-end">
+                      @if (res.status === 'PENDING') {
+                        <div class="d-inline-flex gap-2">
+                          <button (click)="approveReservation(res.id!)" class="btn btn-success btn-sm rounded-3 py-1 px-2">
+                            Approve
+                          </button>
+                          <button (click)="cancelReservation(res.id!)" class="btn btn-danger btn-sm rounded-3 py-1 px-2">
+                            Cancel
+                          </button>
+                        </div>
+                      } @else if (res.status === 'CONFIRMED') {
+                        <button (click)="cancelReservation(res.id!)" class="btn btn-outline-danger btn-sm rounded-3 py-1 px-2">
+                          Cancel Booking
+                        </button>
+                      } @else {
+                        <span class="text-muted small">No actions</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+    }
+
+    <!-- TAB 2: DINING TABLES MANAGER -->
+    @if (activeTab === 'tables') {
+      <div class="row g-4">
+        <!-- Add Table Panel -->
+        <div class="col-lg-4">
+          <div class="glass-card">
+            <h3 class="text-white mb-4"><i class="bi bi-plus-square text-warning me-2"></i> Add Table</h3>
+            
+            <form (ngSubmit)="onAddTable()">
+              <div class="mb-3">
+                <label for="newTableNumber" class="form-label text-secondary small">Table Number (Unique)</label>
+                <input type="number" id="newTableNumber" name="newTableNumber" class="form-control" placeholder="e.g. 106" [(ngModel)]="newTableNumber" required>
+              </div>
+
+              <div class="mb-3">
+                <label for="newCapacity" class="form-label text-secondary small">Max Seating Capacity</label>
+                <input type="number" id="newCapacity" name="newCapacity" class="form-control" min="1" max="20" [(ngModel)]="newCapacity" required>
+              </div>
+
+
+
+              <button type="submit" class="btn btn-gold w-100 py-2"><i class="bi bi-save me-1"></i> Save Table</button>
+            </form>
+          </div>
+
+          <!-- Edit Table Form (appears only during editing) -->
+          @if (editingTableId !== null) {
+            <div class="glass-card border border-warning mt-4 fade-in-section">
+              <h3 class="text-white mb-4"><i class="bi bi-pencil-square text-warning me-2"></i> Edit Table {{ editTableNumber }}</h3>
+              
+              <form (ngSubmit)="onUpdateTable()">
+                <div class="mb-3">
+                  <label for="editTableNumber" class="form-label text-secondary small">Table Number</label>
+                  <input type="number" id="editTableNumber" name="editTableNumber" class="form-control" [(ngModel)]="editTableNumber" required>
+                </div>
+
+                <div class="mb-3">
+                  <label for="editCapacity" class="form-label text-secondary small">Capacity</label>
+                  <input type="number" id="editCapacity" name="editCapacity" class="form-control" [(ngModel)]="editCapacity" required>
+                </div>
+
+
+
+                <div class="mb-4">
+                  <label for="editStatus" class="form-label text-secondary small">Base Status</label>
+                  <select id="editStatus" name="editStatus" class="form-select text-white" [(ngModel)]="editStatus" required>
+                    <option value="AVAILABLE" class="bg-dark text-success">AVAILABLE</option>
+                    <option value="RESERVED" class="bg-dark text-danger">RESERVED (Force Blocked)</option>
+                  </select>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-warning flex-fill py-2">Update</button>
+                  <button type="button" (click)="cancelEditTable()" class="btn btn-outline-secondary flex-fill py-2 text-white">Cancel</button>
+                </div>
+              </form>
+            </div>
+          }
+        </div>
+
+        <!-- Inventory List -->
+        <div class="col-lg-8">
+          <div class="glass-card">
+            <h3 class="text-white mb-4"><i class="bi bi-list-stars text-warning me-2"></i> Table Inventory</h3>
+
+            @if (tables().length === 0) {
+              <div class="text-center py-5 text-secondary">
+                No dining tables found. Seed tables using the database configuration.
+              </div>
+            } @else {
+              <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0 align-middle">
+                  <thead>
+                    <tr class="text-secondary small">
+                      <th class="py-3">Table ID</th>
+                      <th class="py-3">Table No.</th>
+                      <th class="py-3">Capacity</th>
+                      <th class="py-3">Status</th>
+                      <th class="py-3 pe-4 text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (table of tables(); track table.id) {
+                      <tr style="border-color: var(--border-light)">
+                        <td>#TBL-{{ table.id }}</td>
+                        <td class="text-white fw-bold">Table {{ table.tableNumber }}</td>
+                        <td class="text-warning fw-semibold">{{ table.capacity }} guests</td>
+                        <td>
+                          @if (table.status === 'AVAILABLE') {
+                            <span class="badge bg-success bg-opacity-15 text-success border border-success border-opacity-30">Available</span>
+                          } @else {
+                            <span class="badge bg-danger bg-opacity-15 text-danger border border-danger border-opacity-30">Blocked</span>
+                          }
+                        </td>
+                        <td class="pe-4 text-end">
+                          <div class="d-inline-flex gap-2">
+                            <button (click)="startEditTable(table)" class="btn btn-outline-warning btn-sm rounded-3 px-2 py-1">
+                              <i class="bi bi-pencil"></i> Edit
+                            </button>
+                            <button (click)="onDeleteTable(table.id!)" class="btn btn-outline-danger btn-sm rounded-3 px-2 py-1">
+                              <i class="bi bi-trash"></i> Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>

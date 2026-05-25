@@ -1,0 +1,177 @@
+<div class="container py-5 fade-in-section">
+  <div class="text-center mb-5">
+    <h1 class="display-4 text-white fw-bold">Reserve a <span class="gold-text-gradient">Table</span></h1>
+    <p class="text-secondary col-md-6 mx-auto">Select your dining preferences below to query our live seating inventory. Tables are held instantly upon booking confirmation.</p>
+  </div>
+
+  @if (bookingSuccess()) {
+    <div class="row justify-content-center my-5">
+      <div class="col-md-7 text-center">
+        <div class="glass-card p-5 border border-success">
+          <div class="bg-success bg-opacity-10 text-success rounded-circle d-inline-flex mb-4" style="width: 80px; height: 80px; align-items: center; justify-content: center;">
+            <i class="bi bi-calendar2-check-fill fs-1"></i>
+          </div>
+          <h2 class="text-white mb-3">Booking Submitted Successfully!</h2>
+          <p class="text-secondary mb-4">
+            Your dining table reservation request has been registered. You can track the status in your account. Redirecting you shortly...
+          </p>
+          <a routerLink="/my-bookings" class="btn btn-gold">View My Bookings</a>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="row g-4">
+      <!-- 1. Search Criteria Form -->
+      <div class="col-lg-4">
+        <div class="glass-card">
+          <h3 class="text-white mb-4"><i class="bi bi-sliders me-2 text-warning"></i> Seating Query</h3>
+          
+          @if (errorMessage() && !searched()) {
+            <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-3" role="alert">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <form (ngSubmit)="onSearch()">
+            <!-- Date Picker -->
+            <div class="mb-3">
+              <label for="searchDate" class="form-label text-secondary small">Date</label>
+              <input type="date" id="searchDate" name="searchDate" class="form-control" [(ngModel)]="searchDate" required>
+            </div>
+
+            <!-- Time Slots -->
+            <div class="mb-3">
+              <label for="searchTime" class="form-label text-secondary small">Time Slot (2-hour seating)</label>
+              <select id="searchTime" name="searchTime" class="form-select text-white" [(ngModel)]="searchTime" required>
+                @for (slot of timeSlots; track slot.value) {
+                  <option [value]="slot.value" class="bg-dark">{{ slot.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Guest Count -->
+            <div class="mb-4">
+              <label for="guestCount" class="form-label text-secondary small">Party Size (Guests)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-transparent border-secondary text-secondary"><i class="bi bi-people"></i></span>
+                <input type="number" id="guestCount" name="guestCount" class="form-control" min="1" max="12" [(ngModel)]="guestCount" required>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-2 fs-5" [disabled]="isLoadingTables()">
+              @if (isLoadingTables()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Searching...
+              } @else {
+                <i class="bi bi-search me-2"></i> Find Available Tables
+              }
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- 2. Tables Grid & Booking Details -->
+      <div class="col-lg-8">
+        <!-- Tables Display Area -->
+        @if (searched()) {
+          <div class="glass-card mb-4">
+            <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+              <h3 class="text-white mb-0"><i class="bi bi-grid-3x3-gap me-2 text-warning"></i> Select a Table</h3>
+            </div>
+
+            <!-- List of suitable tables -->
+            @if (filteredTables().length === 0) {
+              <div class="text-center py-5 text-secondary">
+                <i class="bi bi-grid fs-1 mb-3 d-block text-muted"></i>
+                No available tables found for this time slot.
+              </div>
+            } @else {
+              <div class="row g-3">
+                @for (table of filteredTables(); track table.id) {
+                  <div class="col-sm-6 col-md-4">
+                    <div class="table-card" 
+                         [class.selected]="selectedTable()?.id === table.id"
+                         (click)="selectTable(table)">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="badge bg-dark border border-secondary">Table {{ table.tableNumber }}</span>
+                        <span class="text-warning small"><i class="bi bi-person-fill"></i> x{{ table.capacity }}</span>
+                      </div>
+                      <div class="fs-4 text-white my-3">
+                        <i class="bi bi-table text-warning"></i>
+                      </div>
+                      <div class="text-secondary small">Dining Seating</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @else if (!isLoadingTables() && !bookingSuccess()) {
+          <!-- Empty State -->
+          <div class="glass-card py-5 text-center text-secondary h-100 d-flex flex-column justify-content-center align-items-center">
+            <div class="p-3 bg-dark rounded-circle mb-4" style="background: rgba(255,255,255,0.02) !important;">
+              <i class="bi bi-calendar-event text-warning" style="font-size: 3rem;"></i>
+            </div>
+            <h4>Seating Inventory Awaiting Query</h4>
+            <p class="small text-muted col-md-8">Use the panel on the left to select your date, time slot, and guest size. We will pull available tables in real-time.</p>
+          </div>
+        }
+
+        <!-- Booking details form -->
+        @if (selectedTable(); as table) {
+          <div class="glass-card border border-warning fade-in-section">
+            <h3 class="text-white mb-4"><i class="bi bi-person-lines-fill me-2 text-warning"></i> Reservation Details</h3>
+            
+            <div class="alert alert-warning bg-warning bg-opacity-10 border-0 text-warning rounded-3 mb-4">
+              <i class="bi bi-info-circle-fill me-2"></i> You are booking <strong>Table {{ table.tableNumber }}</strong> (fits up to {{ table.capacity }} guests) for <strong>{{ searchDate }}</strong> at <strong>{{ searchTime.substring(0, 5) }}</strong>.
+            </div>
+
+            @if (errorMessage() && searched()) {
+              <div class="alert alert-danger border-0 bg-danger bg-opacity-10 text-danger rounded-3" role="alert">
+                {{ errorMessage() }}
+              </div>
+            }
+
+            <form (ngSubmit)="onSubmitBooking()">
+              <div class="row g-3">
+                <!-- Customer Name -->
+                <div class="col-md-6">
+                  <label for="customerName" class="form-label text-secondary small">Contact Name</label>
+                  <input type="text" id="customerName" name="customerName" class="form-control" placeholder="Enter full name" [(ngModel)]="customerName" required>
+                </div>
+
+                <!-- Customer Email -->
+                <div class="col-md-6">
+                  <label for="customerEmail" class="form-label text-secondary small">Email Address</label>
+                  <input type="email" id="customerEmail" name="customerEmail" class="form-control" placeholder="Enter email address" [(ngModel)]="customerEmail" required>
+                </div>
+
+                <!-- Customer Phone -->
+                <div class="col-md-6">
+                  <label for="customerPhone" class="form-label text-secondary small">Phone Number</label>
+                  <input type="text" id="customerPhone" name="customerPhone" class="form-control" placeholder="Enter phone number" [(ngModel)]="customerPhone" required>
+                </div>
+
+                <!-- Special Requests -->
+                <div class="col-md-6">
+                  <label for="specialRequests" class="form-label text-secondary small">Special Requests (Optional)</label>
+                  <input type="text" id="specialRequests" name="specialRequests" class="form-control" placeholder="e.g. window seat, wheelchair access" [(ngModel)]="specialRequests">
+                </div>
+              </div>
+
+              <!-- Submit -->
+              <div class="mt-4 text-end">
+                <button type="submit" class="btn btn-gold px-4 py-2 fs-5" [disabled]="isSubmittingBooking()">
+                  @if (isSubmittingBooking()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Confirming Seating...
+                  } @else {
+                    <i class="bi bi-check2-circle me-2"></i> Confirm Reservation
+                  }
+                </button>
+              </div>
+            </form>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>
