@@ -46,12 +46,16 @@ export class ApiService {
 
   constructor(private http: HttpClient) {
     // Load session on startup
-    const savedUser = localStorage.getItem('dineease_user');
-    if (savedUser) {
+    if (typeof localStorage !== 'undefined' && typeof localStorage.getItem === 'function') {
       try {
-        this.currentUser.set(JSON.parse(savedUser));
+        const savedUser = localStorage.getItem('dineease_user');
+        if (savedUser) {
+          this.currentUser.set(JSON.parse(savedUser));
+        }
       } catch (e) {
-        localStorage.removeItem('dineease_user');
+        if (typeof localStorage.removeItem === 'function') {
+          localStorage.removeItem('dineease_user');
+        }
       }
     }
   }
@@ -60,7 +64,9 @@ export class ApiService {
   login(credentials: any): Observable<UserSession> {
     return this.http.post<UserSession>(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap(user => {
-        localStorage.setItem('dineease_user', JSON.stringify(user));
+        if (typeof localStorage !== 'undefined' && typeof localStorage.setItem === 'function') {
+          localStorage.setItem('dineease_user', JSON.stringify(user));
+        }
         this.currentUser.set(user);
       })
     );
@@ -71,7 +77,9 @@ export class ApiService {
   }
 
   logout() {
-    localStorage.removeItem('dineease_user');
+    if (typeof localStorage !== 'undefined' && typeof localStorage.removeItem === 'function') {
+      localStorage.removeItem('dineease_user');
+    }
     this.currentUser.set(null);
   }
 

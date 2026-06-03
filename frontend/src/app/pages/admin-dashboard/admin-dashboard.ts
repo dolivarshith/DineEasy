@@ -1,5 +1,5 @@
 import { Component, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService, Reservation, DiningTable, Stats } from '../../services/api.service';
@@ -7,7 +7,7 @@ import { ApiService, Reservation, DiningTable, Stats } from '../../services/api.
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-dashboard.html'
 })
 export class AdminDashboard {
@@ -122,6 +122,11 @@ export class AdminDashboard {
       return;
     }
 
+    if (!this.newCapacity || this.newCapacity <= 0) {
+      alert('Capacity must be at least 1.');
+      return;
+    }
+
     const payload: DiningTable = {
       tableNumber: this.newTableNumber,
       capacity: this.newCapacity,
@@ -152,6 +157,16 @@ export class AdminDashboard {
 
   onUpdateTable() {
     if (!this.editingTableId) return;
+
+    if (!this.editTableNumber || this.editTableNumber <= 0) {
+      alert('Please enter a valid table number.');
+      return;
+    }
+
+    if (!this.editCapacity || this.editCapacity <= 0) {
+      alert('Capacity must be at least 1.');
+      return;
+    }
 
     const payload: DiningTable = {
       id: this.editingTableId,

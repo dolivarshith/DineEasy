@@ -36,14 +36,14 @@
             <!-- Date Picker -->
             <div class="mb-3">
               <label for="searchDate" class="form-label text-secondary small">Date</label>
-              <input type="date" id="searchDate" name="searchDate" class="form-control" [(ngModel)]="searchDate" required>
+              <input type="date" id="searchDate" name="searchDate" class="form-control" [min]="minDate" [(ngModel)]="searchDate" required>
             </div>
 
             <!-- Time Slots -->
             <div class="mb-3">
               <label for="searchTime" class="form-label text-secondary small">Time Slot (2-hour seating)</label>
               <select id="searchTime" name="searchTime" class="form-select text-white" [(ngModel)]="searchTime" required>
-                @for (slot of timeSlots; track slot.value) {
+                @for (slot of getFilteredTimeSlots(); track slot.value) {
                   <option [value]="slot.value" class="bg-dark">{{ slot.label }}</option>
                 }
               </select>

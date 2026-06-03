@@ -15,6 +15,7 @@ export class BookTable {
   searchDate = '';
   searchTime = '18:00:00';
   guestCount = 2;
+  minDate = '';
 
   // Search status
   tables = signal<DiningTable[]>([]);
@@ -56,6 +57,7 @@ export class BookTable {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     this.searchDate = `${yyyy}-${mm}-${dd}`;
+    this.minDate = this.searchDate;
 
     // Prefill form if user is logged in
     const currentUser = this.api.currentUser();
@@ -74,10 +76,52 @@ export class BookTable {
     });
   }
 
+  getFilteredTimeSlots() {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    if (this.searchDate === todayStr) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      return this.timeSlots.filter(slot => {
+        const [hourStr] = slot.value.split(':');
+        const slotHour = parseInt(hourStr, 10);
+        return slotHour > currentHour;
+      });
+    }
+    return this.timeSlots;
+  }
+
   onSearch() {
     if (!this.searchDate || !this.searchTime) {
       this.errorMessage.set('Please fill out date and time.');
       return;
+    }
+
+    if (this.guestCount === null || this.guestCount === undefined || this.guestCount < 1) {
+      this.errorMessage.set('Party size must be at least 1.');
+      return;
+    }
+
+    // Check if selected time slot has passed today
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayStr = `${yyyy}-${mm}-${dd}`;
+
+    if (this.searchDate === todayStr) {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const [hourStr] = this.searchTime.split(':');
+      const selectedHour = parseInt(hourStr, 10);
+      if (selectedHour <= currentHour) {
+        this.errorMessage.set('Selected time slot has already passed today. Please select a future time slot.');
+        return;
+      }
     }
 
     this.isLoadingTables.set(true);

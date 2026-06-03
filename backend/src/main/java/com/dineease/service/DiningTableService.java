@@ -33,13 +33,34 @@ public class DiningTableService {
     }
 
     public DiningTable createTable(DiningTable table) {
+        if (table.getTableNumber() == null || table.getTableNumber() <= 0) {
+            throw new IllegalArgumentException("Table number must be positive");
+        }
+        if (table.getCapacity() == null || table.getCapacity() <= 0) {
+            throw new IllegalArgumentException("Capacity must be at least 1");
+        }
         if (diningTableRepository.findByTableNumber(table.getTableNumber()).isPresent()) {
             throw new RuntimeException("Table number " + table.getTableNumber() + " already exists");
+        }
+        if (table.getStatus() == null) {
+            table.setStatus("AVAILABLE");
+        } else {
+            String upperStatus = table.getStatus().toUpperCase();
+            if (!upperStatus.equals("AVAILABLE") && !upperStatus.equals("RESERVED")) {
+                throw new IllegalArgumentException("Invalid table status: " + table.getStatus());
+            }
+            table.setStatus(upperStatus);
         }
         return diningTableRepository.save(table);
     }
 
     public DiningTable updateTable(Long id, DiningTable tableDetails) {
+        if (tableDetails.getTableNumber() == null || tableDetails.getTableNumber() <= 0) {
+            throw new IllegalArgumentException("Table number must be positive");
+        }
+        if (tableDetails.getCapacity() == null || tableDetails.getCapacity() <= 0) {
+            throw new IllegalArgumentException("Capacity must be at least 1");
+        }
         DiningTable table = getTableById(id);
         
         // If table number is changing, verify the new number is not taken
@@ -49,15 +70,28 @@ public class DiningTableService {
             }
         }
         
+        if (tableDetails.getStatus() != null) {
+            String upperStatus = tableDetails.getStatus().toUpperCase();
+            if (!upperStatus.equals("AVAILABLE") && !upperStatus.equals("RESERVED")) {
+                throw new IllegalArgumentException("Invalid table status: " + tableDetails.getStatus());
+            }
+            table.setStatus(upperStatus);
+        }
+        
         table.setTableNumber(tableDetails.getTableNumber());
         table.setCapacity(tableDetails.getCapacity());
-        table.setStatus(tableDetails.getStatus());
         
         return diningTableRepository.save(table);
     }
 
     public void deleteTable(Long id) {
         DiningTable table = getTableById(id);
+        
+        // Prevent deletion if table has reservations
+        if (reservationRepository.existsByDiningTableId(id)) {
+            throw new IllegalArgumentException("Cannot delete table because it has associated reservations. Please cancel or delete the reservations first.");
+        }
+        
         diningTableRepository.delete(table);
     }
 
@@ -68,6 +102,11 @@ public class DiningTableService {
         List<DiningTable> availableTables = new ArrayList<>();
 
         for (DiningTable table : suitableTables) {
+            // Check if table is physically available (not force-blocked by admin)
+            if (!"AVAILABLE".equalsIgnoreCase(table.getStatus())) {
+                continue;
+            }
+
             // 2. Fetch active reservations on that date
             List<Reservation> activeReservations = reservationRepository
                     .findActiveReservationsForTableAndDate(table.getId(), date);
