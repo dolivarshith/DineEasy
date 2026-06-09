@@ -87,6 +87,7 @@ public class DiningTableService {
         return diningTableRepository.save(table);
     }
 
+    @SuppressWarnings("null")
     public void deleteTable(@NonNull Long id) {
         DiningTable table = getTableById(id);
         
