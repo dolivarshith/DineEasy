@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class DiningTableController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DiningTable> getTableById(@PathVariable Long id) {
+    public ResponseEntity<DiningTable> getTableById(@PathVariable @NonNull Long id) {
         return ResponseEntity.ok(diningTableService.getTableById(id));
     }
 
@@ -43,12 +44,12 @@ public class DiningTableController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DiningTable> updateTable(@PathVariable Long id, @Valid @RequestBody DiningTable tableDetails) {
+    public ResponseEntity<DiningTable> updateTable(@PathVariable @NonNull Long id, @Valid @RequestBody DiningTable tableDetails) {
         return ResponseEntity.ok(diningTableService.updateTable(id, tableDetails));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTable(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTable(@PathVariable @NonNull Long id) {
         diningTableService.deleteTable(id);
         return ResponseEntity.noContent().build();
     }

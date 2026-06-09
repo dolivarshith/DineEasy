@@ -6,7 +6,9 @@ import com.dineease.model.Reservation;
 import com.dineease.repository.DiningTableRepository;
 import com.dineease.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class DiningTableService {
 
     @Autowired
@@ -27,7 +30,7 @@ public class DiningTableService {
         return diningTableRepository.findAll();
     }
 
-    public DiningTable getTableById(Long id) {
+    public DiningTable getTableById(@NonNull Long id) {
         return diningTableRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Table not found with id: " + id));
     }
@@ -40,7 +43,7 @@ public class DiningTableService {
             throw new IllegalArgumentException("Capacity must be at least 1");
         }
         if (diningTableRepository.findByTableNumber(table.getTableNumber()).isPresent()) {
-            throw new RuntimeException("Table number " + table.getTableNumber() + " already exists");
+            throw new IllegalArgumentException("Table number " + table.getTableNumber() + " already exists");
         }
         if (table.getStatus() == null) {
             table.setStatus("AVAILABLE");
@@ -54,7 +57,7 @@ public class DiningTableService {
         return diningTableRepository.save(table);
     }
 
-    public DiningTable updateTable(Long id, DiningTable tableDetails) {
+    public DiningTable updateTable(@NonNull Long id, DiningTable tableDetails) {
         if (tableDetails.getTableNumber() == null || tableDetails.getTableNumber() <= 0) {
             throw new IllegalArgumentException("Table number must be positive");
         }
@@ -66,7 +69,7 @@ public class DiningTableService {
         // If table number is changing, verify the new number is not taken
         if (!table.getTableNumber().equals(tableDetails.getTableNumber())) {
             if (diningTableRepository.findByTableNumber(tableDetails.getTableNumber()).isPresent()) {
-                throw new RuntimeException("Table number " + tableDetails.getTableNumber() + " already exists");
+                throw new IllegalArgumentException("Table number " + tableDetails.getTableNumber() + " already exists");
             }
         }
         
@@ -84,7 +87,7 @@ public class DiningTableService {
         return diningTableRepository.save(table);
     }
 
-    public void deleteTable(Long id) {
+    public void deleteTable(@NonNull Long id) {
         DiningTable table = getTableById(id);
         
         // Prevent deletion if table has reservations

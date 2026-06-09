@@ -9,15 +9,17 @@ import com.dineease.model.Reservation;
 import com.dineease.repository.DiningTableRepository;
 import com.dineease.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Service
+@Transactional
 public class ReservationService {
 
     @Autowired
@@ -48,9 +50,15 @@ public class ReservationService {
             throw new IllegalArgumentException("Reservation date and time must be in the future.");
         }
 
+        Long rawTableId = request.getDiningTableId();
+        if (rawTableId == null) {
+            throw new IllegalArgumentException("Dining table ID is required.");
+        }
+        long tableId = rawTableId;
+
         // 1. Find table
-        DiningTable table = diningTableRepository.findById(request.getDiningTableId())
-                .orElseThrow(() -> new ResourceNotFoundException("Dining table not found with id: " + request.getDiningTableId()));
+        DiningTable table = diningTableRepository.findById(tableId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dining table not found with id: " + tableId));
 
         // Check if table is available (not force-blocked by admin)
         if (!"AVAILABLE".equalsIgnoreCase(table.getStatus())) {
@@ -88,7 +96,7 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    public Reservation updateReservationStatus(Long id, String status) {
+    public Reservation updateReservationStatus(@NonNull Long id, String status) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found with id: " + id));
 

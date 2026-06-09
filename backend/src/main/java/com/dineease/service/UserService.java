@@ -7,10 +7,12 @@ import com.dineease.model.User;
 import com.dineease.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService {
 
     @Autowired
@@ -18,10 +20,10 @@ public class UserService {
 
     public User registerUser(RegisterRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
-            throw new RuntimeException("Username already exists");
+            throw new IllegalArgumentException("Username already exists");
         }
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new IllegalArgumentException("Email already exists");
         }
         User user = new User();
         user.setUsername(request.getUsername());
@@ -39,6 +41,6 @@ public class UserService {
                 return new LoginResponse(user.getUsername(), user.getEmail(), user.getRole());
             }
         }
-        throw new RuntimeException("Invalid username or password");
+        throw new IllegalArgumentException("Invalid username or password");
     }
 }

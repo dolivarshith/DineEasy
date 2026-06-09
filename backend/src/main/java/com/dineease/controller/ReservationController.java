@@ -7,6 +7,7 @@ import com.dineease.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class ReservationController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<Reservation> updateStatus(
-            @PathVariable Long id,
+            @PathVariable @NonNull Long id,
             @RequestParam("status") String status) {
         return ResponseEntity.ok(reservationService.updateReservationStatus(id, status));
     }
